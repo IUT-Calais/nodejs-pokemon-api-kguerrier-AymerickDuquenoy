@@ -8,6 +8,7 @@
     "start": "node ./build/index.js",
     "type-check": "tsc --noEmit",
     "build": "tsc",
+    "db:seed": "prisma db seed",
     "db:reset": "prisma migrate reset --force",
     "db:migrate": "prisma migrate dev",
     "db:generate": "prisma generate",
@@ -20,7 +21,7 @@
     "url": "git+https://github.com/vfourny/nodejs-pokedex-api.git"
   },
   "keywords": [],
-  "author": "",
+  "author": "Aymerick Duquenoy",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/vfourny/nodejs-pokedex-api/issues"
