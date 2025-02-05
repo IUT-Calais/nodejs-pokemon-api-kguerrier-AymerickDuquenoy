@@ -29,3 +29,27 @@ export const getPokemonId = async (req: Request, res: Response)=>{
     }
    
 }
+
+
+export const postPokemon = async (req: Request, res: Response) => {
+    const { name, pokedexId, lifePoints, size, weight, typeID,imageUrl } = req.body;
+
+    try {
+        const newPokemon = await prisma.pokemonCard.create({
+            data: {
+                name: name,
+                pokedexId: pokedexId,
+                lifePoints: lifePoints,
+                size: size,
+                weight: weight,
+                typeID: typeID,
+                imageUrl: imageUrl,
+            },
+        });
+
+        res.status(201).json({ message: "Pokémon créé", pokemon: newPokemon });
+    } catch (error) {
+        console.error("Database error:", error);
+    }
+};
+
