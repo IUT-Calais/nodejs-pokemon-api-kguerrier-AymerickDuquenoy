@@ -53,3 +53,39 @@ export const postPokemon = async (req: Request, res: Response) => {
     }
 };
 
+export const patchPokemon = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const { name, pokedexId, lifePoints, size, weight, typeID,imageUrl } = req.body;
+
+    try {
+        const newPokemon = await prisma.pokemonCard.update({
+            where : {id : Number(id)},
+            data: {
+                name: name,
+                pokedexId: pokedexId,
+                lifePoints: lifePoints,
+                size: size,
+                weight: weight,
+                typeID: typeID,
+                imageUrl: imageUrl,
+            },
+        });
+
+        res.status(201).json({ message: "Pokémon modifier", pokemon: newPokemon });
+    } catch (error) {
+        console.error("Database error:", error);
+    }
+};
+
+export const deletePokemon = async (req: Request, res: Response) => {
+    const { id } = req.params;
+
+    try {
+        const deletePokemon = await prisma.pokemonCard.delete({
+            where : {id : Number(id)},});
+        res.status(201).json({ message: "Pokémon Supprimer"});
+    } catch (error) {
+        console.error("Database error:", error);
+    }
+};
+
