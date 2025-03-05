@@ -46,7 +46,12 @@ async function main() {
       {name: 'Tortank',pokedexId : 9, lifePoints : 80,typeID : 3, size : 160, weight : 85.5 },
     ]
   });
-
+  
+  await prisma.users.createMany({
+    data:[
+      {email: "admin@gmail.com",password: "admin"}
+    ]
+  });
   console.log('Seed completed!');
 }
 
