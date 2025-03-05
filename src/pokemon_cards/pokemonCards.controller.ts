@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
+import prisma from '../client';
 
 // Get all Pokémon cards
 export const getPokemon = async (_req: Request, res: Response) => {
@@ -8,7 +8,7 @@ export const getPokemon = async (_req: Request, res: Response) => {
         const ListPokemon = await prisma.pokemonCard.findMany();
         res.status(200).send(ListPokemon);
     } catch (error) {
-        res.status(500).json({ error: 'Une erreur est survenue' });
+        res.status(500).send({ error: 'Une erreur est survenue' });
     }
 };
 
@@ -22,12 +22,16 @@ export const getPokemonId = async (req: Request, res: Response) => {
         });
 
         if (!Pokemon) {
-             res.status(404).send('Pokémon non trouvé');
+             res.status(404).send('Pokemon not found');
+             return;
+        }
+        else{
+             res.status(200).send(Pokemon);
         }
 
-        res.status(200).send(Pokemon);
+       
     } catch (error) {
-        res.status(500).json({ error: 'Une erreur est survenue' });
+        res.status(500).send({ error: 'Pokémon non trouvé' });
     }
 };
 
@@ -37,7 +41,7 @@ export const postPokemon = async (req: Request, res: Response) => {
 
     // Validation checks
     if (!name || !pokedexId || !lifePoints || !size || !weight || !typeID || !imageUrl) {
-         res.status(400).json({ error: 'Un ou plusieurs champs requis sont vides' });
+         res.status(400).send({ error: 'Un ou plusieurs champs requis sont vides' });
     }
 
     try {
@@ -47,7 +51,7 @@ export const postPokemon = async (req: Request, res: Response) => {
         });
 
         if (!typeExists) {
-             res.status(400).json({ error: 'L\'ID de type renseigné n\'existe pas' });
+             res.status(400).send({ error: 'L\'ID de type renseigné n\'existe pas' });
         }
 
         // Check for duplicate name or pokedexId
@@ -56,7 +60,7 @@ export const postPokemon = async (req: Request, res: Response) => {
         });
 
         if (existingPokemon) {
-             res.status(400).json({ error: 'Un doublon de data existe (nom ou pokedexId)' });
+             res.status(400).send({ error: 'Un doublon de data existe (nom ou pokedexId)' });
         }
 
         // Create new Pokémon card
@@ -72,9 +76,9 @@ export const postPokemon = async (req: Request, res: Response) => {
             },
         });
 
-        res.status(201).json({ message: 'Pokémon créé', pokemon: newPokemon });
+        res.status(201).send({ message: 'Pokémon créé', pokemon: newPokemon });
     } catch (error) {
-        res.status(500).json({ error: 'Une erreur est survenue' });
+        res.status(500).send({ error: 'Une erreur est survenue' });
     }
 };
 
@@ -84,7 +88,7 @@ export const patchPokemon = async (req: Request, res: Response) => {
     const { name, pokedexId, lifePoints, size, weight, typeID, imageUrl } = req.body;
 
     if (!name || !pokedexId || !lifePoints || !size || !weight || !typeID || !imageUrl) {
-         res.status(400).json({ error: 'Un ou plusieurs champs requis sont vides' });
+         res.status(400).send({ error: 'Un ou plusieurs champs requis sont vides' });
     }
 
     try {
@@ -94,7 +98,7 @@ export const patchPokemon = async (req: Request, res: Response) => {
         });
 
         if (!typeExists) {
-             res.status(400).json({ error: 'L\'ID de type renseigné n\'existe pas' });
+             res.status(400).send({ error: 'L\'ID de type renseigné n\'existe pas' });
         }
 
         // Check for duplicate name or pokedexId
@@ -103,7 +107,7 @@ export const patchPokemon = async (req: Request, res: Response) => {
         });
 
         if (existingPokemon && existingPokemon.id !== Number(id)) {
-             res.status(400).json({ error: 'Un doublon de data existe (nom ou pokedexId)' });
+             res.status(400).send({ error: 'Un doublon de data existe (nom ou pokedexId)' });
         }
 
         // Update the Pokémon card
@@ -120,9 +124,9 @@ export const patchPokemon = async (req: Request, res: Response) => {
             },
         });
 
-        res.status(200).json({ message: 'Pokémon modifié', pokemon: modifiPokemon });
+        res.status(200).send({ message: 'Pokémon modifié', pokemon: modifiPokemon });
     } catch (error) {
-        res.status(500).json({ error: 'Une erreur est survenue' });
+        res.status(500).send({ error: 'Une erreur est survenue' });
     }
 };
 
@@ -136,7 +140,7 @@ export const deletePokemon = async (req: Request, res: Response) => {
         });
 
         if (!pokemonExists) {
-             res.status(404).json({ error: 'Pokémon non trouvé' });
+             res.status(404).send({ error: 'Pokémon non trouvé' });
         }
 
         // Delete the Pokémon card
