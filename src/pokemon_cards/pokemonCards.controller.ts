@@ -22,7 +22,7 @@ export const getPokemonId = async (req: Request, res: Response) => {
         });
 
         if (!Pokemon) {
-            return res.status(404).send('Pokémon non trouvé');
+             res.status(404).send('Pokémon non trouvé');
         }
 
         res.status(200).send(Pokemon);
@@ -37,7 +37,7 @@ export const postPokemon = async (req: Request, res: Response) => {
 
     // Validation checks
     if (!name || !pokedexId || !lifePoints || !size || !weight || !typeID || !imageUrl) {
-        return res.status(400).json({ error: 'Un ou plusieurs champs requis sont vides' });
+         res.status(400).json({ error: 'Un ou plusieurs champs requis sont vides' });
     }
 
     try {
@@ -47,7 +47,7 @@ export const postPokemon = async (req: Request, res: Response) => {
         });
 
         if (!typeExists) {
-            return res.status(400).json({ error: 'L\'ID de type renseigné n\'existe pas' });
+             res.status(400).json({ error: 'L\'ID de type renseigné n\'existe pas' });
         }
 
         // Check for duplicate name or pokedexId
@@ -56,7 +56,7 @@ export const postPokemon = async (req: Request, res: Response) => {
         });
 
         if (existingPokemon) {
-            return res.status(400).json({ error: 'Un doublon de data existe (nom ou pokedexId)' });
+             res.status(400).json({ error: 'Un doublon de data existe (nom ou pokedexId)' });
         }
 
         // Create new Pokémon card
@@ -84,7 +84,7 @@ export const patchPokemon = async (req: Request, res: Response) => {
     const { name, pokedexId, lifePoints, size, weight, typeID, imageUrl } = req.body;
 
     if (!name || !pokedexId || !lifePoints || !size || !weight || !typeID || !imageUrl) {
-        return res.status(400).json({ error: 'Un ou plusieurs champs requis sont vides' });
+         res.status(400).json({ error: 'Un ou plusieurs champs requis sont vides' });
     }
 
     try {
@@ -94,7 +94,7 @@ export const patchPokemon = async (req: Request, res: Response) => {
         });
 
         if (!typeExists) {
-            return res.status(400).json({ error: 'L\'ID de type renseigné n\'existe pas' });
+             res.status(400).json({ error: 'L\'ID de type renseigné n\'existe pas' });
         }
 
         // Check for duplicate name or pokedexId
@@ -103,7 +103,7 @@ export const patchPokemon = async (req: Request, res: Response) => {
         });
 
         if (existingPokemon && existingPokemon.id !== Number(id)) {
-            return res.status(400).json({ error: 'Un doublon de data existe (nom ou pokedexId)' });
+             res.status(400).json({ error: 'Un doublon de data existe (nom ou pokedexId)' });
         }
 
         // Update the Pokémon card
@@ -136,7 +136,7 @@ export const deletePokemon = async (req: Request, res: Response) => {
         });
 
         if (!pokemonExists) {
-            return res.status(404).json({ error: 'Pokémon non trouvé' });
+             res.status(404).json({ error: 'Pokémon non trouvé' });
         }
 
         // Delete the Pokémon card
