@@ -1,0 +1,280 @@
+openapi: 3.0.0
+info:
+  title: Prisma User API
+  version: 1.0.0
+  description: API pour gérer les utilisateurs et leurs posts
+
+servers:
+  - url: http://localhost:3000
+    description: Serveur local
+
+paths:
+  /pokemon-cards:
+    get:
+      summary: Récupère toutes les cartes Pokémon
+      tags: [PokemonCards]
+      responses:
+        "200":
+          description: Liste des cartes Pokémon
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PokemonCard"
+
+    post:
+      summary: Crée une nouvelle carte Pokémon
+      tags: [PokemonCards]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PokemonCardInput"
+      responses:
+        "201":
+          description: Carte Pokémon créée
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PokemonCard"
+        "401":
+          description: Non autorisé
+
+  /pokemon-cards/{id}:
+    get:
+      summary: Récupère une carte Pokémon par ID
+      tags: [PokemonCards]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Carte trouvée
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PokemonCard"
+        "404":
+          description: Carte non trouvée
+
+    patch:
+      summary: Met à jour une carte Pokémon
+      tags: [PokemonCards]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PokemonCardInput"
+      responses:
+        "200":
+          description: Carte mise à jour
+        "404":
+          description: Carte non trouvée
+
+    delete:
+      summary: Supprime une carte Pokémon
+      tags: [PokemonCards]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Carte supprimée avec succès
+        "404":
+          description: Carte non trouvée
+
+  /users:
+    post:
+      summary: Crée un nouvel utilisateur
+      tags: [Users]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  example: ash@example.com
+                password:
+                  type: string
+                  example: pikachu123
+      responses:
+        "201":
+          description: Utilisateur créé
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Non autorisé (token manquant ou invalide)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Unauthorized
+
+  /users/login:
+    post:
+      summary: Authentifier un utilisateur
+      tags: [Users]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  example: ash@example.com
+                password:
+                  type: string
+                  example: pikachu123
+      responses:
+        "201":
+          description: Connexion réussie, retourne un token JWT
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        "401":
+          description: Mauvais identifiants
+        "404":
+          description: Utilisateur non trouvé
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Utilisateur non trouvé
+
+  /users/{userId}:
+    get:
+      summary: Récupère un utilisateur par son ID
+      tags: [Users]
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID de l'utilisateur
+      responses:
+        "200":
+          description: Utilisateur trouvé avec ses posts
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserWithPosts"
+        "404":
+          description: Utilisateur non trouvé
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Utilisateur non trouvé
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    PokemonCard:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Pikachu
+        type:
+          type: string
+          example: Électrique
+        hp:
+          type: integer
+          example: 35
+
+    PokemonCardInput:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Pikachu
+        type:
+          type: string
+          example: Électrique
+        hp:
+          type: integer
+          example: 35
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        email:
+          type: string
+          example: ash@example.com
+
+    Post:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: My First Post
+        authorId:
+          type: integer
+          example: 1
+
+    UserWithPosts:
+      allOf:
+        - $ref: "#/components/schemas/User"
+        - type: object
+          properties:
+            posts:
+              type: array
+              items:
+                $ref: "#/components/schemas/Post"
