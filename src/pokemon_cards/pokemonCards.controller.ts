@@ -52,6 +52,7 @@ export const postPokemon = async (req: Request, res: Response) => {
 
         if (!typeExists) {
              res.status(400).send({ error: 'L\'ID de type renseigné n\'existe pas' });
+             return;
         }
 
         // Check for duplicate name or pokedexId
@@ -148,7 +149,7 @@ export const deletePokemon = async (req: Request, res: Response) => {
             where: { id: Number(id) },
         });
 
-        res.status(200).json({ message: 'Pokémon supprimé' });
+        res.status(204).json({ message: 'Pokémon supprimé' });
     } catch (error) {
         res.status(500).json({ error: 'Une erreur est survenue' });
     }

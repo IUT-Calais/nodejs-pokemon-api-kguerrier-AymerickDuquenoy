@@ -51,13 +51,17 @@ describe('PokemonCard API', () => {
         typeID: 4,
         imageUrl: "https://assets.pokemon.com/assets/cms2/img/pokedex/full/001.png"
       };
-  
-      // const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImVtYWlsIjoiYWRtaW5AZ21haWwuY29tIiwiaWF0IjoxNzQ3MDM5NTg2LCJleHAiOjE3NDcxMjU5ODZ9.ex25vmGGuNQRddzmG74I7wY4xhrg9MmQqVLFSjydCGU";
+  prismaMock.type.findUnique.mockResolvedValue({
+        id: 4,
+        name: 'Plante',
+      });
+      prismaMock.pokemonCard.findFirst.mockResolvedValue(null);
       prismaMock.pokemonCard.create.mockResolvedValue(createdPokemonCard);
+      
   
       const response = await request(app)
         .post('/pokemon-cards')
-        .set('Authorization', 'Bearer mockToken')
+        .set('Authorization', 'Bearer mockedToken')
         .send({
           name: "Bulbizarre",
           pokedexId: 1,
@@ -69,24 +73,92 @@ describe('PokemonCard API', () => {
         });
 
       expect(response.status).toBe(201);
-      expect(response.body).toEqual(createdPokemonCard); 
+      expect(response.body).toEqual({message: 'Pokémon créé', pokemon:createdPokemonCard}); 
+    });
+
+    it('should return an error when typeID does not exist', async () => {
+      prismaMock.type.findUnique.mockResolvedValue(null); // type doesn't exist
+    
+      const response = await request(app)
+        .post('/pokemon-cards')
+        .set('Authorization', 'Bearer mockedToken')
+        .send({
+          name: "Bulbizarre",
+          pokedexId: 1,
+          size: 0.7, 
+          lifePoints: 45,
+          weight: 6.9,
+          typeID: 4,
+          imageUrl: "https://assets.pokemon.com/assets/cms2/img/pokedex/full/001.png",
+        });
+    
+      expect(response.status).toBe(400);
+      expect(response.body).toEqual({ error: 'L\'ID de type renseigné n\'existe pas' });
+    });
+    
+  });
+  
+
+  describe('PATCH /pokemon-cards/:pokemonCardId', () => {
+    it('should update an existing PokemonCard', async () => {
+      const updatedPokemonCard = { 
+        id: 1,
+        name: "Bulbizarre",
+        pokedexId: 2,
+        size: 0.7,
+        lifePoints: 45,
+        weight: 6.9,
+        typeID: 4,
+        imageUrl: "https://assets.pokemon.com/assets/cms2/img/pokedex/full/001.png"
+      };
+  
+      // Mocks
+      prismaMock.pokemonCard.findUnique.mockResolvedValue({ id: 1,name: "Bulbizarre",
+        pokedexId: 1,
+        size: 0.7, 
+        lifePoints: 45,
+        weight: 6.9,
+        typeID: 4,
+        imageUrl: "https://assets.pokemon.com/assets/cms2/img/pokedex/full/001.png" }); // The card exists
+      prismaMock.type.findUnique.mockResolvedValue({ id: 4, name: 'Plante' }); // Valid type
+      prismaMock.pokemonCard.update.mockResolvedValue(updatedPokemonCard); // Simulate update
+  
+      const response = await request(app)
+        .patch('/pokemon-cards/1')
+        .set('Authorization', 'Bearer mockedToken')
+        .send({
+          name: "Bulbizarre",
+          pokedexId: 2,
+          size: 0.7,
+          lifePoints: 45,
+          weight: 6.9,
+          typeID: 4,
+          imageUrl: "https://assets.pokemon.com/assets/cms2/img/pokedex/full/001.png"
+        });
+  
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual({ message: 'Pokémon modifié', pokemon:updatedPokemonCard});
     });
   });
   
 
-  // describe('PATCH /pokemon-cards/:pokemonCardId', () => {
-  //   it('should update an existing PokemonCard', async () => {
-  //     const updatedPokemonCard = {};
-  //     expect(response.status).toBe(200);  
-  //     expect(response.body).toEqual(updatedPokemonCard);
-  //   });
-  // });
-
-  // describe('DELETE /pokemon-cards/:pokemonCardId', () => {
-  //   it('should delete a PokemonCard', async () => {
-  //     expect(response.status).toBe(204);
-  //   });
-  // });
+  describe('DELETE /pokemon-cards/:pokemonCardId', () => {
+    it('should delete a PokemonCard', async () => {
+      prismaMock.pokemonCard.findUnique.mockResolvedValue({ id: 1,name: "Bulbizarre",
+        pokedexId: 1,
+        size: 0.7, 
+        lifePoints: 45,
+        weight: 6.9,
+        typeID: 4,
+        imageUrl: "https://assets.pokemon.com/assets/cms2/img/pokedex/full/001.png" }); // The card exists
+      prismaMock.type.findUnique.mockResolvedValue({ id: 4, name: 'Plante' }); // Valid type
+      const response = await request(app)
+        .delete('/pokemon-cards/1')
+        .set('Authorization', 'Bearer mockedToken');
+  
+      expect(response.status).toBe(204);
+    });
+  });
 });
 
 
