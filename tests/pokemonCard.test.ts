@@ -35,17 +35,44 @@ describe('PokemonCard API', () => {
       prismaMock.pokemonCard.findUnique.mockResolvedValue(null);
       const response = await request(app).get('/pokemon-cards/null');
       expect(response.status).toBe(404);
-      expect(response.body).toEqual({ error: 'Pokemon not found' });
+      expect(response.body).toEqual({error:'Pokemon not found'});
     });
   });
 
-  // describe('POST /pokemon-cards', () => {
-  //   it('should create a new PokemonCard', async () => {
-  //     const createdPokemonCard = {};
-  //     expect(response.status).toBe(201);
-  //     expect(response.body).toEqual(createdPokemonCard);
-  //   });
-  // });
+  describe('POST /pokemon-cards', () => {
+    it('should create a new PokemonCard', async () => {
+      const createdPokemonCard = { 
+        id: 1, 
+        name: "Bulbizarre",
+        pokedexId: 1,
+        size: 0.7,
+        lifePoints: 45,
+        weight: 6.9,
+        typeID: 4,
+        imageUrl: "https://assets.pokemon.com/assets/cms2/img/pokedex/full/001.png"
+      };
+  
+      // const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImVtYWlsIjoiYWRtaW5AZ21haWwuY29tIiwiaWF0IjoxNzQ3MDM5NTg2LCJleHAiOjE3NDcxMjU5ODZ9.ex25vmGGuNQRddzmG74I7wY4xhrg9MmQqVLFSjydCGU";
+      prismaMock.pokemonCard.create.mockResolvedValue(createdPokemonCard);
+  
+      const response = await request(app)
+        .post('/pokemon-cards')
+        .set('Authorization', 'Bearer mockToken')
+        .send({
+          name: "Bulbizarre",
+          pokedexId: 1,
+          size: 0.7, 
+          lifePoints: 45,
+          weight: 6.9,
+          typeID: 4,
+          imageUrl: "https://assets.pokemon.com/assets/cms2/img/pokedex/full/001.png",
+        });
+
+      expect(response.status).toBe(201);
+      expect(response.body).toEqual(createdPokemonCard); 
+    });
+  });
+  
 
   // describe('PATCH /pokemon-cards/:pokemonCardId', () => {
   //   it('should update an existing PokemonCard', async () => {
@@ -61,3 +88,5 @@ describe('PokemonCard API', () => {
   //   });
   // });
 });
+
+

@@ -22,7 +22,7 @@ export const getPokemonId = async (req: Request, res: Response) => {
         });
 
         if (!Pokemon) {
-             res.status(404).send('Pokemon not found');
+             res.status(404).send({error:'Pokemon not found'});
              return;
         }
         else{
@@ -140,7 +140,7 @@ export const deletePokemon = async (req: Request, res: Response) => {
         });
 
         if (!pokemonExists) {
-             res.status(404).send({ error: 'Pokémon non trouvé' });
+             res.status(404).send({ error: 'Pokemon not found' });
         }
 
         // Delete the Pokémon card
